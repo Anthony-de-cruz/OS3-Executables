@@ -1,9 +1,11 @@
-#include <linux/limits.h>
+#include <dirent.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#include <linux/limits.h>
 
 // Parse argv into dirs.
 //
@@ -41,8 +43,18 @@ int parse_args(int argc, char *argv[], char **dirs) {
 // - Returns false if there is an invalid directory
 bool print_executables(int dirc, char *dirs[]) {
 
-    for (int x = 0; x + 1 < dirc; x++) {
-        printf("%s\n", dirs[x]);
+    for (int dir = 0; dir + 1 < dirc; dir++) {
+        printf("%s\n", dirs[dir]);
+
+        DIR *dp = opendir(dirs[dir]);
+        struct dirent *entry;
+
+        while ((entry = readdir(dp)) != NULL) {
+
+            printf("%8ld - %s\n", entry->d_ino, entry->d_name);
+        }
+
+        closedir(dp);
     }
 
     return true;
@@ -55,7 +67,7 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    char **dirs = malloc(ARG_MAX * PATH_MAX);
+    char **dirs = malloc(_POSIX_ARG_MAX * PATH_MAX);
 
     int dirc = parse_args(argc, argv, dirs);
 
