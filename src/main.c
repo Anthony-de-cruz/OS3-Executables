@@ -5,36 +5,47 @@
 #include <string.h>
 #include <unistd.h>
 
-// Iterate over the directories,
-// printing all of the executable files found inside.
-//
-// - returns true if all directories are valid
-// - return false if there is an invalid directory
-bool print_executables(char *directories[]) { return true; }
-
-// Parse argv into args.
+// Parse argv into dirs.
 //
 // - Accepts formats ['/usr/bin', 'usr/sbin'] and ['/usr/bin:/usr/sbin'].
-void parse_args(int argc, char *argv[], char *args[]) {
+//
+// - Returns number of directories in dirs
+int parse_args(int argc, char *argv[], char **dirs) {
 
-    int dir = 0;
-    int arg = 0;
+    int dirc = 0;
 
-    for (; arg + 1 < argc; arg++) {
+    for (int arg = 0; arg + 1 < argc; arg++) {
 
         char *temp = strdup(argv[arg + 1]);
         char *token = strtok(temp, ":");
-        
+
         // Tokenise each string, delimiting by :
         // and appending to args[]
         while (token != NULL) {
-            args[dir] = token;
-            dir++;
+            dirs[dirc] = token;
+            dirc++;
             token = strtok(NULL, ":");
         }
 
         free(token);
     }
+
+    dirs = realloc(dirs, dirc * sizeof(char *));
+    return dirc;
+}
+
+// Iterate over the directories,
+// printing all of the executable files found inside.
+//
+// - Returns true if all directories are valid
+// - Returns false if there is an invalid directory
+bool print_executables(int dirc, char *dirs[]) {
+
+    for (int x = 0; x + 1 < dirc; x++) {
+        printf("%s\n", dirs[x]);
+    }
+
+    return true;
 }
 
 int main(int argc, char *argv[]) {
@@ -44,17 +55,17 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    char *args[ARG_MAX];
+    char **dirs = malloc(ARG_MAX * PATH_MAX);
 
-    parse_args(argc, argv, args);
-    
+    int dirc = parse_args(argc, argv, dirs);
+
     /*
     printf("\nArgs check\n");
     for (int x = 0; x < 15; x++) {
         printf("    args[%d] = %s\n", x, args[x]);
     }*/
 
-    if (print_executables(args)) {
+    if (print_executables(dirc, dirs)) {
         return EXIT_SUCCESS;
     }
 
