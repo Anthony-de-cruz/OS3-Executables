@@ -9,7 +9,7 @@ Build with:
 ❯ make
 gcc -o OS3-Executables.out src/main.c
 ```
-Example@
+Example:
 ```sh
 ❯ ./OS3-Executables.out /home/anthonydecruz/.cargo/bin .
 DIRECTORY: /home/anthonydecruz/.cargo/bin
